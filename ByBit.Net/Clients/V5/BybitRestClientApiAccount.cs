@@ -349,7 +349,7 @@ namespace Bybit.Net.Clients.V5
         #region Get All Asset Balances
 
         /// <inheritdoc />
-        public async Task<WebCallResult<BybitAssetBalances>> GetAllAssetBalancesAsync(
+        public async Task<WebCallResult<BybitAllAssetBalances>> GetAllAssetBalancesAsync(
             AccountType accountType,
             string? memberId = null,
             string? asset = null,
@@ -364,7 +364,7 @@ namespace Bybit.Net.Clients.V5
             parameters.AddOptionalParameter("memberId", memberId);
             parameters.AddOptionalParameter("withBonus", withBonus == true ? "1" : "0");
 
-            return await _baseClient.SendRequestAsync<BybitAssetBalances>(_baseClient.GetUrl("v5/asset/transfer/query-account-coins-balance"), HttpMethod.Get, ct, parameters, true).ConfigureAwait(false);
+            return await _baseClient.SendRequestAsync<BybitAllAssetBalances>(_baseClient.GetUrl("v5/asset/transfer/query-account-coins-balance"), HttpMethod.Get, ct, parameters, true).ConfigureAwait(false);
         }
 
         #endregion
@@ -372,7 +372,7 @@ namespace Bybit.Net.Clients.V5
         #region Get Asset Balance
 
         /// <inheritdoc />
-        public async Task<WebCallResult<BybitAssetBalances>> GetAssetBalanceAsync(
+        public async Task<WebCallResult<BybitSingleAssetBalance>> GetAssetBalanceAsync(
             AccountType accountType,
             string asset,
             string? memberId = null,
@@ -387,7 +387,7 @@ namespace Bybit.Net.Clients.V5
             parameters.AddOptionalParameter("memberId", memberId);
             parameters.AddOptionalParameter("withBonus", withBonus == true ? "1" : "0");
 
-            return await _baseClient.SendRequestAsync<BybitAssetBalances>(_baseClient.GetUrl("v5/asset/transfer/query-account-coin-balance"), HttpMethod.Get, ct, parameters, true).ConfigureAwait(false);
+            return await _baseClient.SendRequestAsync<BybitSingleAssetBalance>(_baseClient.GetUrl("v5/asset/transfer/query-account-coin-balance"), HttpMethod.Get, ct, parameters, true).ConfigureAwait(false);
         }
 
         #endregion
@@ -483,7 +483,7 @@ namespace Bybit.Net.Clients.V5
                 { "coin", asset },
                 { "fromMemberId", fromMemberId },
                 { "toMemberId", toMemberId },
-                { "quantity", quantity.ToString(CultureInfo.InvariantCulture) },
+                { "amount", quantity.ToString(CultureInfo.InvariantCulture) },
                 { "transferId", transferId ?? Guid.NewGuid().ToString() }
             };
 
@@ -712,6 +712,89 @@ namespace Bybit.Net.Clients.V5
         public async Task<WebCallResult<BybitApiKeyInfo>> GetApiKeyInfoAsync(CancellationToken ct = default)
         {
             return await _baseClient.SendRequestAsync<BybitApiKeyInfo>(_baseClient.GetUrl("v5/user/query-api"), HttpMethod.Get, ct, null, true).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Add Or Reduce Margin
+
+        /// <inheritdoc />
+        public async Task<WebCallResult<BybitPosition>> AddOrReduceMarginAsync(
+            Category category,
+            string symbol,
+            decimal margin,
+            PositionIdx? positionIdx = null,
+            CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>()
+            {
+                { "category", EnumConverter.GetString(category) },
+                { "symbol", symbol },
+                { "margin", margin.ToString(CultureInfo.InvariantCulture) },
+            };
+
+            parameters.AddOptionalParameter("positionIdx", EnumConverter.GetString(positionIdx));
+
+            return await _baseClient.SendRequestAsync<BybitPosition>(_baseClient.GetUrl("v5/position/add-margin"), HttpMethod.Post, ct, parameters, true).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Set Spot Margin Leverage
+
+        /// <inheritdoc />
+        public async Task<WebCallResult> SetSpotMarginLeverageAsync(decimal leverage, CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>()
+            {
+                { "leverage", leverage.ToString(CultureInfo.InvariantCulture) }
+            };
+
+            return await _baseClient.SendRequestAsync(_baseClient.GetUrl("v5/spot-margin-trade/set-leverage"), HttpMethod.Post, ct, parameters, true).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Get Spot Margin Status And Leverage
+
+        /// <inheritdoc />
+        public async Task<WebCallResult<BybitSpotMarginLeverageStatus>> GetSpotMarginStatusAndLeverageAsync(CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>();
+            return await _baseClient.SendRequestAsync<BybitSpotMarginLeverageStatus>(_baseClient.GetUrl("v5/spot-margin-trade/state"), HttpMethod.Get, ct, parameters, true).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Set Spot Margin Trade Mode
+
+        /// <inheritdoc />
+        public async Task<WebCallResult<BybitSpotMarginStatus>> SetSpotMarginTradeModeAsync(bool spotMarginMode, CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>()
+            {
+                { "spotMarginMode", spotMarginMode ? "1" : "0" }
+            };
+
+            return await _baseClient.SendRequestAsync<BybitSpotMarginStatus>(_baseClient.GetUrl("v5/spot-margin-trade/switch-mode"), HttpMethod.Post, ct, parameters, true).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Get Spot Margin Data
+
+        /// <inheritdoc />
+        public async Task<WebCallResult<IEnumerable<BybitSpotMarginVipMarginList>>> GetSpotMarginDataAsync(string? asset = null, string? vipLevel = null, CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>();
+            parameters.AddOptionalParameter("currency", asset);
+            parameters.AddOptionalParameter("vipLevel", vipLevel);
+
+            var result = await _baseClient.SendRequestAsync<BybitSpotMarginVipMarginData>(_baseClient.GetUrl("v5/spot-margin-trade/data"), HttpMethod.Get, ct, parameters, false).ConfigureAwait(false);
+            if (!result)
+                return result.As< IEnumerable<BybitSpotMarginVipMarginList>>(default);
+
+            return result.As(result.Data.VipCoinList);
         }
 
         #endregion
