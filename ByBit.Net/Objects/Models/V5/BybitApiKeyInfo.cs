@@ -1,5 +1,4 @@
-﻿using Bybit.Net.Converters;
-using CryptoExchange.Net.Converters;
+﻿using CryptoExchange.Net.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,6 +22,10 @@ namespace Bybit.Net.Objects.Models.V5
         /// Api key
         /// </summary>
         public string ApiKey { get; set; } = string.Empty;
+        /// <summary>
+        /// Secret (when creating new API key)
+        /// </summary>
+        public string? Secret { get; set; }
         /// <summary>
         /// Is read only
         /// </summary>

@@ -11,10 +11,10 @@ namespace Bybit.Net.Objects.Models.V5
     public class BybitAccountInfo
     {
         /// <summary>
-        /// Account status
+        /// Unified margin status
         /// </summary>
         [JsonConverter(typeof(EnumConverter))]
-        public UnifiedMarginStatus AccountStatus { get; set; }
+        public UnifiedMarginStatus UnifiedMarginStatus { get; set; }
         /// <summary>
         /// Margin info
         /// </summary>
@@ -39,5 +39,16 @@ namespace Bybit.Net.Objects.Models.V5
         /// </summary>
         [JsonProperty("timeWindow")]
         public int DcpTimeWindow { get; set; }
+        /// <summary>
+        /// Whether the account is a master trader (copytrading)
+        /// </summary>
+        [JsonProperty("isMasterTrader")]
+        public bool IsMasterTrader { get; set; }
+        /// <summary>
+        /// Whether the unified account enables Spot hedging
+        /// </summary>
+        [JsonProperty("spotHedgingStatus")]
+        [JsonConverter(typeof(BoolConverter))]
+        public bool SpotHedgingStatus { get; set; }
     }
 }

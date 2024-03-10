@@ -69,7 +69,7 @@ namespace Bybit.Net.Objects.Models.V5
         /// <summary>
         /// Trigger direction
         /// </summary>
-        [JsonProperty("triggerDirection", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(EnumConverter))]
+        [JsonProperty("triggerDirection", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(EnumConverter), new object[] { true, true })]
         public TriggerDirection? TriggerDirection { get; set; }
         /// <summary>
         /// Trigger price
@@ -84,7 +84,7 @@ namespace Bybit.Net.Objects.Models.V5
         /// <summary>
         /// Position idx
         /// </summary>
-        [JsonProperty("positionIdx", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(EnumConverter))]
+        [JsonProperty("positionIdx", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(EnumConverter), new object[] { true, true })]
         public PositionIdx? PositionIdx { get; set; }
         /// <summary>
         /// Take profit limit price
@@ -116,5 +116,10 @@ namespace Bybit.Net.Objects.Models.V5
         /// </summary>
         [JsonProperty("orderIv", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? OrderImpliedVolatility { get; set; }
+        /// <summary>
+        /// The unit for qty when creating spot market orders for unified trading account
+        /// </summary>
+        [JsonProperty("marketUnit", NullValueHandling = NullValueHandling.Ignore), JsonConverter(typeof(EnumConverter))]
+        public MarketUnit? MarketUnit { get; set; }
     }
 }
